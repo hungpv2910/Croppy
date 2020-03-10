@@ -12,28 +12,35 @@ import com.lyrebirdstudio.croppylib.util.bitmap.BitmapUtils
 import com.lyrebirdstudio.croppylib.util.file.FileCreator
 import com.lyrebirdstudio.croppylib.util.file.FileExtension
 import com.lyrebirdstudio.croppylib.util.file.FileOperationRequest
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 
 class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
-
-    private val disposable = CompositeDisposable()
-
+    private val showProgressLiveData = MutableLiveData<Boolean>()
+    private val errorCropLiveData = MutableLiveData<Boolean>()
     private val saveBitmapLiveData = MutableLiveData<Uri>()
 
+    private var cropDisposable: Disposable? = null
+
     fun getSaveBitmapLiveData(): LiveData<Uri> = saveBitmapLiveData
+    fun showProgressLiveData(): LiveData<Boolean> = showProgressLiveData
+    fun errorCropLiveData(): LiveData<Boolean> = errorCropLiveData
 
     fun saveBitmap(cropRequest: CropRequest, croppedBitmapData: CroppedBitmapData) {
-
+        cropDisposable?.dispose()
         when (cropRequest) {
             is CropRequest.Manual -> {
-                disposable.add(
-                    BitmapUtils
+                BitmapUtils
                     .saveBitmap(croppedBitmapData, cropRequest.destinationUri.toFile())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { saveBitmapLiveData.value = cropRequest.destinationUri })
+                    .composeProgress()
+                    .subscribe(
+                        { saveBitmapLiveData.value = cropRequest.destinationUri },
+                        { doOnCropError() })
+                    .let { cropDisposable = it }
             }
             is CropRequest.Auto -> {
                 val destinationUri = FileCreator.createFile(
@@ -45,12 +52,15 @@ class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
                     app.applicationContext
                 ).toUri()
 
-                disposable.add(
-                    BitmapUtils
+                BitmapUtils
                     .saveBitmap(croppedBitmapData, destinationUri.toFile())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { saveBitmapLiveData.value = destinationUri })
+                    .composeProgress()
+                    .subscribe(
+                        { saveBitmapLiveData.value = destinationUri },
+                        { doOnCropError() })
+                    .let { cropDisposable = it }
 
             }
         }
@@ -58,9 +68,15 @@ class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
 
     override fun onCleared() {
         super.onCleared()
-        if (disposable.isDisposed.not()) {
-            disposable.dispose()
-        }
+        cropDisposable?.dispose()
     }
 
+    private fun Completable.composeProgress(): Completable {
+        return this.doOnSubscribe { showProgressLiveData.postValue(true) }
+            .doOnTerminate { showProgressLiveData.postValue(false) }
+    }
+
+    private fun doOnCropError() {
+        errorCropLiveData.postValue(true)
+    }
 }

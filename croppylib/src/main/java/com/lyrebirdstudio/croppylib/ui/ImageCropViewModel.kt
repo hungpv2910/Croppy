@@ -12,7 +12,6 @@ import com.lyrebirdstudio.croppylib.util.bitmap.BitmapUtils
 import com.lyrebirdstudio.croppylib.util.bitmap.ResizedBitmap
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
 class ImageCropViewModel(val app: Application) : AndroidViewModel(app) {
@@ -35,7 +34,8 @@ class ImageCropViewModel(val app: Application) : AndroidViewModel(app) {
             .resize(cropRequest.sourceUri, app.applicationContext)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(Consumer { resizedBitmapLiveData.value = it })
+            .subscribe({ resizedBitmapLiveData.value = it },
+                { resizedBitmapLiveData.value = ResizedBitmap(null) })
             .also { compositeDisposable.add(it) }
 
 

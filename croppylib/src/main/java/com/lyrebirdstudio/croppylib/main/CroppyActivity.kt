@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -18,6 +19,8 @@ class CroppyActivity : AppCompatActivity() {
 
     private lateinit var viewModel: CroppyActivityViewModel
 
+    private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_croppy)
@@ -26,27 +29,46 @@ class CroppyActivity : AppCompatActivity() {
 
         val cropRequest = intent.getParcelableExtra(KEY_CROP_REQUEST) ?: CropRequest.empty()
 
-        if (savedInstanceState == null) {
-            val cropFragment = ImageCropFragment.newInstance(cropRequest)
-                .apply {
-                    onApplyClicked = {
-                        viewModel.saveBitmap(cropRequest = cropRequest, croppedBitmapData = it)
-                    }
+        val cropFragment = if (savedInstanceState == null) {
+            ImageCropFragment.newInstance(cropRequest).also { fragment ->
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.containerCroppy, fragment, ImageCropFragment::class.java.name)
+                    .commitAllowingStateLoss()
+            }
+        } else {
+            supportFragmentManager.findFragmentByTag(ImageCropFragment::class.java.name) as? ImageCropFragment
+        }
 
-                    onCancelClicked = {
-                        setResult(Activity.RESULT_CANCELED)
-                        finish()
-                    }
-                }
-            supportFragmentManager.beginTransaction()
-                .add(R.id.containerCroppy, cropFragment)
-                .commitAllowingStateLoss()
+        cropFragment?.apply {
+            onApplyClicked = {
+                viewModel.saveBitmap(cropRequest = cropRequest, croppedBitmapData = it)
+            }
+
+            onCancelClicked = {
+                setResult(Activity.RESULT_CANCELED)
+                finish()
+            }
         }
 
 
         viewModel.getSaveBitmapLiveData().observe(this, Observer {
             setResult(Activity.RESULT_OK, Intent().apply { data = it })
             finish()
+        })
+
+        viewModel.showProgressLiveData().observe(this, Observer { show ->
+            progressDialog.safeDismiss()
+            if (show) {
+                progressDialog.show(supportFragmentManager, null)
+            }
+        })
+
+        viewModel.errorCropLiveData().observe(this, Observer {
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.crop_error_message),
+                Toast.LENGTH_LONG
+            ).show()
         })
     }
 

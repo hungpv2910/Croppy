@@ -4,6 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.view.ViewCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -79,7 +82,21 @@ class ImageCropFragment : Fragment() {
 
         viewModel
             .getResizedBitmapLiveData()
-            .observe(this, Observer { binding.cropView.setBitmap(it.bitmap) })
+            .observe(this, Observer { resizedBitmap ->
+                if (resizedBitmap.bitmap == null) {
+                    activity?.let {
+                        Toast.makeText(it.applicationContext, R.string.crop_error_message, Toast.LENGTH_LONG).show()
+                        it.finish()
+                    }
+                    return@Observer
+                }
+
+                if (ViewCompat.isLaidOut(binding.cropView)) {
+                    binding.cropView.setBitmap(resizedBitmap.bitmap)
+                } else {
+                    binding.cropView.doOnPreDraw { binding.cropView.setBitmap(resizedBitmap.bitmap) }
+                }
+            })
 
     }
 

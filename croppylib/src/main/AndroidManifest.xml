@@ -2,7 +2,9 @@
     package="com.lyrebirdstudio.croppylib">
 
     <application>
-        <activity android:name=".main.CroppyActivity" />
+        <activity
+            android:name=".main.CroppyActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

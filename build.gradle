@@ -19,6 +19,27 @@ allprojects {
     repositories {
         google()
         jcenter()
+        // HuhuSDK declaration
+        maven {
+            authentication {
+                basic(BasicAuthentication)
+            }
+            url "https://api.bitbucket.org/2.0/repositories/hungpham2910/huhusdk-maven/src/snapshots"
+            credentials {
+                username REPOSITORY_USERNAME
+                password REPOSITORY_PASSWORD
+            }
+        }
+        maven {
+            authentication {
+                basic(BasicAuthentication)
+            }
+            url "https://api.bitbucket.org/2.0/repositories/hungpham2910/huhusdk-maven/src/releases"
+            credentials {
+                username REPOSITORY_USERNAME
+                password REPOSITORY_PASSWORD
+            }
+        }
     }
 }
 

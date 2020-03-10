@@ -43,16 +43,16 @@ dependencies {
     //Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.1.0'
-    implementation 'androidx.exifinterface:exifinterface:1.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.1.0'
 
     //Support
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
     //Architecture Components
-    implementation "androidx.lifecycle:lifecycle-extensions:2.1.0"
-    kapt "androidx.lifecycle:lifecycle-compiler:2.1.0"
-    api project(path: ':aspectratiorecyclerviewlib')
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
+    api "com.huhustudio:aspectratiorecyclerviewlib:1.0.0"
 
     //RxJava & RxAndroid
     implementation "io.reactivex.rxjava2:rxjava:2.2.13"

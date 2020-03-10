@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -17,6 +18,8 @@ class CroppyActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCroppyBinding
 
     private lateinit var viewModel: CroppyActivityViewModel
+
+    private val progressDialog: ProgressDialog by lazy { ProgressDialog() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +50,17 @@ class CroppyActivity : AppCompatActivity() {
         viewModel.getSaveBitmapLiveData().observe(this, Observer {
             setResult(Activity.RESULT_OK, Intent().apply { data = it })
             finish()
+        })
+
+        viewModel.showProgressLiveData.observe(this, Observer { show->
+            progressDialog.safeDismiss()
+            if (show){
+                progressDialog.show(supportFragmentManager, ProgressDialog::class.java.simpleName)
+            }
+        })
+
+        viewModel.errorCropLiveData.observe(this, Observer {
+            Toast.makeText(this, getString(R.string.error_crop), Toast.LENGTH_LONG).show()
         })
     }
 

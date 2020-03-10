@@ -3,4 +3,6 @@
 
     <string name="width">Width</string>
     <string name="height">Height</string>
+    <string name="loading">Please wait...</string>
+    <string name="error_crop">Crop error!</string>
 </resources>

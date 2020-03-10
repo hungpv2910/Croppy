@@ -24,6 +24,10 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
+tasks.withType(Javadoc).all {
+    enabled = false
+}
+
 afterEvaluate {
     javadoc.classpath += files(android.libraryVariants.collect { variant ->
         variant.javaCompileProvider.get().classpath.files

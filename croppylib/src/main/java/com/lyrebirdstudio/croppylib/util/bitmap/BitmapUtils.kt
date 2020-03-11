@@ -16,8 +16,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import kotlin.math.pow
-import kotlin.math.sqrt
 
 
 object BitmapUtils {
@@ -38,7 +36,7 @@ object BitmapUtils {
 
     fun resize(uri: Uri, context: Context): Single<ResizedBitmap> {
         return Single.create {
-            val maxSize = calculateMaxBitmapSize(context)
+            val (reqWidth, reqHeight) = calculateMaxBitmapSize(context)
 
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
@@ -49,7 +47,7 @@ object BitmapUtils {
             var scale = 1
 
             while (true) {
-                if (widthTemp / 2 < maxSize || heightTemp / 2 < maxSize)
+                if (widthTemp / 2 < reqWidth || heightTemp / 2 < reqHeight)
                     break
                 widthTemp /= 2
                 heightTemp /= 2
@@ -65,7 +63,11 @@ object BitmapUtils {
                 resultOptions
             )
 
-            resizedBitmap = resizedBitmap?.rotateBitmap(getOrientation(context.contentResolver.openInputStream(uri)))
+            resizedBitmap = resizedBitmap?.rotateBitmap(
+                getOrientation(
+                    context.contentResolver.openInputStream(uri)
+                )
+            )
 
             it.onSuccess(ResizedBitmap(resizedBitmap))
         }
@@ -87,14 +89,7 @@ object BitmapUtils {
         return orientation
     }
 
-    /**
-     * This method calculates maximum size of both width and height of bitmap.
-     * It is twice the device screen diagonal for default implementation (extra quality to zoom image).
-     * Size cannot exceed max texture size.
-     *
-     * @return - max bitmap size in pixels.
-     */
-    private fun calculateMaxBitmapSize(context: Context): Int {
+    private fun calculateMaxBitmapSize(context: Context): Pair<Int, Int> {
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as? WindowManager
         val display: Display
         val width: Int
@@ -106,10 +101,8 @@ object BitmapUtils {
             display.getSize(size)
         }
 
-        width = size.x
-        height = size.y
-
-        // Twice the device screen diagonal as default
-        return sqrt(width.toDouble().pow(2.0) + height.toDouble().pow(2.0)).toInt()
+        width = (size.x * 1.5f).toInt()
+        height = (size.y * 1.5f).toInt()
+        return width to height
     }
 }

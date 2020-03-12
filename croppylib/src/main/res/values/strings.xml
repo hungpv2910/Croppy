@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">croppylib</string>
-
     <string name="width">Width</string>
     <string name="height">Height</string>
     <string name="crop_in_progress">Please wait…</string>
     <string name="crop_error_message">Unknown error occurred, please try again later.</string>
+    <string name="load_image_error_message">Sorry something went wrong and we couldn\'t load this image, please try again later !!!</string>
+    <string name="load_image_error_title">Failed to load image</string>
+    <string name="ok">OK</string>
 </resources>

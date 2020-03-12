@@ -24,6 +24,8 @@ class ImageCropFragment : Fragment() {
 
     var onApplyClicked: ((CroppedBitmapData) -> Unit)? = null
 
+    var onImageLoadFailed: (() -> Unit)? = null
+
     var onCancelClicked: (() -> Unit)? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,10 +86,7 @@ class ImageCropFragment : Fragment() {
             .getResizedBitmapLiveData()
             .observe(viewLifecycleOwner, Observer { resizedBitmap ->
                 if (resizedBitmap.bitmap == null) {
-                    activity?.let {
-                        Toast.makeText(it.applicationContext, R.string.crop_error_message, Toast.LENGTH_LONG).show()
-                        it.finish()
-                    }
+                    onImageLoadFailed?.invoke()
                     return@Observer
                 }
 

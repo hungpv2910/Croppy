@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCroppy(uri: Uri) {
-
+//        val uri = Uri.parse("https://i.picsum.photos/id/461/1000/1000.jpg")
         // Save to given destination uri.
         val destinationUri =
             FileCreator

@@ -54,7 +54,9 @@ object BitmapUtils {
                     .use { stream -> getBitmap(stream, options) }
                     ?.rotateBitmap(orientation)
 
-                it.onSuccess(ResizedBitmap(resizedBitmap))
+                if (resizedBitmap == null) it.onError(Exception("Could not rotate bitmap, seemed an OOM?"))
+                else it.onSuccess(ResizedBitmap(resizedBitmap))
+
             } catch (ex: Throwable) {
                 it.onError(ex)
             }

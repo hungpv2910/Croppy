@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -45,6 +46,20 @@ class CroppyActivity : AppCompatActivity() {
         cropFragment?.apply {
             onApplyClicked = {
                 viewModel.saveBitmap(cropRequest = cropRequest, croppedBitmapData = it)
+            }
+
+            onImageLoadFailed = {
+                if (!isFinishing) {
+                    AlertDialog.Builder(this@CroppyActivity)
+                        .setTitle(R.string.load_image_error_title)
+                        .setMessage(R.string.load_image_error_message)
+                        .setCancelable(false)
+                        .setPositiveButton(R.string.ok) { dialog, _ ->
+                            dialog.dismiss()
+                            finish()
+                        }
+                        .create().show()
+                }
             }
 
             onCancelClicked = {

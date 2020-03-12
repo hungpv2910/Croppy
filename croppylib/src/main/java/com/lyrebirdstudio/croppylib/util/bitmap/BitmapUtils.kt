@@ -9,6 +9,7 @@ import android.view.Display
 import android.view.WindowManager
 import androidx.exifinterface.media.ExifInterface
 import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
+import com.lyrebirdstudio.croppylib.util.bitmap.UriUtils.processInput
 import com.lyrebirdstudio.croppylib.util.extensions.rotateBitmap
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -34,48 +35,83 @@ object BitmapUtils {
         }
     }
 
-    fun resize(uri: Uri, context: Context): Single<ResizedBitmap> {
+    fun resize(input: Input, context: Context): Single<ResizedBitmap> {
         return Single.create {
-            val (reqWidth, reqHeight) = calculateMaxBitmapSize(context)
+            try {
+                processInput(context, input)
 
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null, options)
+                val transformedSource = input.sourceUri
 
-            var widthTemp = options.outWidth
-            var heightTemp = options.outHeight
-            var scale = 1
+                val (reqWidth, reqHeight) = calculateMaxBitmapSize(context)
+                val orientation =
+                    transformedSource.inputStream(context).use { stream -> getOrientation(stream) }
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                transformedSource.inputStream(context).use { stream -> getBitmap(stream, options) }
 
-            while (true) {
-                if (widthTemp / 2 < reqWidth || heightTemp / 2 < reqHeight)
-                    break
-                widthTemp /= 2
-                heightTemp /= 2
-                scale *= 2
+                options.inSampleSize =
+                    calculateInSampleSize(options, reqWidth, reqHeight, orientation)
+                options.inJustDecodeBounds = false
+
+                val resizedBitmap = transformedSource.inputStream(context)
+                    .use { stream -> getBitmap(stream, options) }
+                    ?.rotateBitmap(orientation)
+
+                it.onSuccess(ResizedBitmap(resizedBitmap))
+            } catch (ex: Throwable) {
+                it.onError(ex)
             }
-
-            val resultOptions = BitmapFactory.Options().apply {
-                inSampleSize = scale
-            }
-            var resizedBitmap = BitmapFactory.decodeStream(
-                context.contentResolver.openInputStream(uri),
-                null,
-                resultOptions
-            )
-
-            resizedBitmap = resizedBitmap?.rotateBitmap(
-                getOrientation(
-                    context.contentResolver.openInputStream(uri)
-                )
-            )
-
-            it.onSuccess(ResizedBitmap(resizedBitmap))
         }
+    }
+
+    private fun getBitmap(
+        inputStream: InputStream?,
+        options: BitmapFactory.Options? = null
+    ): Bitmap? {
+        return try {
+            if (inputStream == null) return null
+            BitmapFactory.decodeStream(inputStream, null, options)
+        } catch (e: OutOfMemoryError) {
+            return null
+        }
+    }
+
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int,
+        orientation: Int
+    ): Int {
+        // Raw height and width of image
+        val (height: Int, width: Int) = options.run {
+            when (orientation) {
+                ExifInterface.ORIENTATION_TRANSPOSE,
+                ExifInterface.ORIENTATION_ROTATE_90,
+                ExifInterface.ORIENTATION_TRANSVERSE,
+                ExifInterface.ORIENTATION_ROTATE_270 -> outWidth to outHeight
+                else -> outHeight to outWidth
+            }
+        }
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+
+            val halfHeight: Int = height / 2
+            val halfWidth: Int = width / 2
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+
+        return inSampleSize
     }
 
     private fun getOrientation(inputStream: InputStream?): Int {
         val exifInterface: ExifInterface
-        var orientation = 0
+        var orientation = ExifInterface.ORIENTATION_UNDEFINED
         try {
             exifInterface = ExifInterface(inputStream!!)
             orientation = exifInterface.getAttributeInt(
@@ -101,8 +137,10 @@ object BitmapUtils {
             display.getSize(size)
         }
 
-        width = (size.x * 1.5f).toInt()
-        height = (size.y * 1.5f).toInt()
+        width = (size.x)
+        height = (size.y)
         return width to height
     }
+
+    data class Input(var sourceUri: Uri, var destinationUri: Uri)
 }

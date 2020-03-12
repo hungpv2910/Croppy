@@ -1,4 +1,4 @@
-package com.lyrebirdstudio.croppylib.util.file
+package com.lyrebirdstudio.croppy.file
 
 import android.content.Context
 import android.os.Environment

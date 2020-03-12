@@ -10,11 +10,11 @@ import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.lyrebirdstudio.croppylib.main.CropRequest
 import com.lyrebirdstudio.croppylib.R
 import com.lyrebirdstudio.croppylib.databinding.FragmentImageCropBinding
-import com.lyrebirdstudio.croppylib.util.delegate.inflate
+import com.lyrebirdstudio.croppylib.main.CropRequest
 import com.lyrebirdstudio.croppylib.state.CropFragmentViewState
+import com.lyrebirdstudio.croppylib.util.delegate.inflate
 
 class ImageCropFragment : Fragment() {
 
@@ -78,11 +78,11 @@ class ImageCropFragment : Fragment() {
 
         viewModel
             .getCropViewStateLiveData()
-            .observe(this, Observer(this@ImageCropFragment::renderViewState))
+            .observe(viewLifecycleOwner, Observer(this@ImageCropFragment::renderViewState))
 
         viewModel
             .getResizedBitmapLiveData()
-            .observe(this, Observer { resizedBitmap ->
+            .observe(viewLifecycleOwner, Observer { resizedBitmap ->
                 if (resizedBitmap.bitmap == null) {
                     activity?.let {
                         Toast.makeText(it.applicationContext, R.string.crop_error_message, Toast.LENGTH_LONG).show()

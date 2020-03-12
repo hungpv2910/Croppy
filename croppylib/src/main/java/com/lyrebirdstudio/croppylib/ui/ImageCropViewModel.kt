@@ -31,11 +31,15 @@ class ImageCropViewModel(val app: Application) : AndroidViewModel(app) {
         this.cropRequest = cropRequest
 
         BitmapUtils
-            .resize(cropRequest.sourceUri, app.applicationContext)
+            .resize(BitmapUtils.Input(cropRequest.sourceUri, cropRequest.destinationUri), app.applicationContext)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ resizedBitmapLiveData.value = it },
-                { resizedBitmapLiveData.value = ResizedBitmap(null) })
+            .subscribe({
+                resizedBitmapLiveData.value = it
+            }, {
+                it.printStackTrace()
+                resizedBitmapLiveData.value = ResizedBitmap(null)
+            })
             .also { compositeDisposable.add(it) }
 
 

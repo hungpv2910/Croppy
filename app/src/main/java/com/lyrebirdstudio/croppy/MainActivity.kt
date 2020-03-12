@@ -1,6 +1,5 @@
 package com.lyrebirdstudio.croppy
 
-import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -8,14 +7,12 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
-import com.lyrebirdstudio.aspectratiorecyclerviewlib.aspectratio.model.AspectRatio
 import com.lyrebirdstudio.croppy.databinding.ActivityMainBinding
+import com.lyrebirdstudio.croppy.file.FileCreator
+import com.lyrebirdstudio.croppy.file.FileOperationRequest
 import com.lyrebirdstudio.croppylib.Croppy
 import com.lyrebirdstudio.croppylib.main.CropRequest
 import com.lyrebirdstudio.croppylib.main.CroppyTheme
-import com.lyrebirdstudio.croppylib.main.StorageType
-import com.lyrebirdstudio.croppylib.util.file.FileCreator
-import com.lyrebirdstudio.croppylib.util.file.FileOperationRequest
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +24,7 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.buttonChoose.setOnClickListener {
-            startCroppy()
+            pickGallery()
         }
     }
 
@@ -39,29 +36,12 @@ class MainActivity : AppCompatActivity() {
                 Log.v("TEST", it.toString())
                 binding.imageViewCropped.setImageURI(it)
             }
+        } else if (requestCode == 999) {
+            startCroppy(data?.data ?: return)
         }
     }
 
-    private fun startCroppy() {
-        val uri = Uri.Builder()
-            .scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
-            .authority(resources.getResourcePackageName(R.drawable.aa))
-            .appendPath(resources.getResourceTypeName(R.drawable.aa))
-            .appendPath(resources.getResourceEntryName(R.drawable.aa))
-            .build()
-
-        //Saves to external and return uri
-        val externalCropRequest = CropRequest.Auto(
-            sourceUri = uri,
-            requestCode = RC_CROP_IMAGE
-        )
-
-        //Saves to cache and return uri
-        val cacheCropRequest = CropRequest.Auto(
-            sourceUri = uri,
-            requestCode = RC_CROP_IMAGE,
-            storageType = StorageType.CACHE
-        )
+    private fun startCroppy(uri: Uri) {
 
         // Save to given destination uri.
         val destinationUri =
@@ -69,20 +49,7 @@ class MainActivity : AppCompatActivity() {
                 .createFile(FileOperationRequest.createRandom(), application.applicationContext)
                 .toUri()
 
-        val manualCropRequest = CropRequest.Manual(
-            sourceUri = uri,
-            destinationUri = destinationUri,
-            requestCode = RC_CROP_IMAGE
-        )
-
-        val excludeAspectRatiosCropRequest = CropRequest.Manual(
-            sourceUri = uri,
-            destinationUri = destinationUri,
-            requestCode = RC_CROP_IMAGE,
-            excludedAspectRatios = arrayListOf(AspectRatio.ASPECT_FREE)
-        )
-
-        val themeCropRequest = CropRequest.Manual(
+        val themeCropRequest = CropRequest(
             sourceUri = uri,
             destinationUri = destinationUri,
             requestCode = RC_CROP_IMAGE,
@@ -90,6 +57,15 @@ class MainActivity : AppCompatActivity() {
         )
 
         Croppy.start(this, themeCropRequest)
+    }
+
+
+    fun pickGallery() {
+        startActivityForResult(Intent(Intent.ACTION_GET_CONTENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+        }, 999)
     }
 
     companion object {

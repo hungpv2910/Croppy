@@ -9,8 +9,9 @@ import android.view.Display
 import android.view.WindowManager
 import androidx.exifinterface.media.ExifInterface
 import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
-import com.lyrebirdstudio.croppylib.util.bitmap.UriUtils.processInput
+import com.lyrebirdstudio.croppylib.util.file.UriUtils.processUri
 import com.lyrebirdstudio.croppylib.util.extensions.rotateBitmap
+import com.lyrebirdstudio.croppylib.util.file.inputStream
 import io.reactivex.Completable
 import io.reactivex.Single
 import java.io.File
@@ -18,9 +19,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 
-
 object BitmapUtils {
-
     fun saveBitmap(croppedBitmapData: CroppedBitmapData, file: File): Completable {
         return Completable.create {
             try {
@@ -35,12 +34,10 @@ object BitmapUtils {
         }
     }
 
-    fun resize(input: Input, context: Context): Single<ResizedBitmap> {
+    fun resize(sourceUri: Uri, context: Context): Single<ResizedBitmap> {
         return Single.create {
             try {
-                processInput(context, input)
-
-                val transformedSource = input.sourceUri
+                val transformedSource = processUri(context, sourceUri)
 
                 val (reqWidth, reqHeight) = calculateMaxBitmapSize(context)
                 val orientation =
@@ -141,6 +138,4 @@ object BitmapUtils {
         height = (size.y * 1.0f).toInt()
         return width to height
     }
-
-    data class Input(var sourceUri: Uri, var destinationUri: Uri)
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lyrebirdstudio.croppylib.util.bitmap;
+package com.lyrebirdstudio.croppylib.util.file;
 
 import android.annotation.SuppressLint;
 import android.content.ContentUris;

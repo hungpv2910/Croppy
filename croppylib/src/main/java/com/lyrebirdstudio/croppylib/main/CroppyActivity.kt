@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.lyrebirdstudio.croppylib.Croppy
 import com.lyrebirdstudio.croppylib.R
 import com.lyrebirdstudio.croppylib.databinding.ActivityCroppyBinding
 import com.lyrebirdstudio.croppylib.ui.ImageCropFragment
@@ -23,6 +24,8 @@ class CroppyActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Croppy.recordedError = null
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_croppy)
 
         viewModel = ViewModelProviders.of(this).get(CroppyActivityViewModel::class.java)

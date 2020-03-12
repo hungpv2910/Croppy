@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.lyrebirdstudio.aspectratiorecyclerviewlib.aspectratio.model.AspectRatio
+import com.lyrebirdstudio.croppylib.Croppy
 import com.lyrebirdstudio.croppylib.main.CropRequest
 import com.lyrebirdstudio.croppylib.state.CropFragmentViewState
 import com.lyrebirdstudio.croppylib.util.bitmap.BitmapUtils
@@ -31,13 +32,14 @@ class ImageCropViewModel(val app: Application) : AndroidViewModel(app) {
         this.cropRequest = cropRequest
 
         BitmapUtils
-            .resize(BitmapUtils.Input(cropRequest.sourceUri, cropRequest.destinationUri), app.applicationContext)
+            .resize(cropRequest.sourceUri, app.applicationContext)
             .subscribeOn(Schedulers.computation())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 resizedBitmapLiveData.value = it
             }, {
                 it.printStackTrace()
+                Croppy.recordedError = it
                 resizedBitmapLiveData.value = ResizedBitmap(null)
             })
             .also { compositeDisposable.add(it) }

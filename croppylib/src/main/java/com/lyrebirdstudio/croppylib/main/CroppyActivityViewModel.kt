@@ -6,6 +6,7 @@ import androidx.core.net.toFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.lyrebirdstudio.croppylib.Croppy
 import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
 import com.lyrebirdstudio.croppylib.util.bitmap.BitmapUtils
 import io.reactivex.Completable
@@ -33,7 +34,10 @@ class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
             .composeProgress()
             .subscribe(
                 { saveBitmapLiveData.value = cropRequest.destinationUri },
-                { doOnCropError() })
+                {
+                    Croppy.recordedError = it
+                    doOnCropError()
+                })
             .let { cropDisposable = it }
     }
 

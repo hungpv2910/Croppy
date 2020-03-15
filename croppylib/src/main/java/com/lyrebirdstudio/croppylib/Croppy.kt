@@ -6,8 +6,7 @@ import com.lyrebirdstudio.croppylib.main.CropRequest
 import com.lyrebirdstudio.croppylib.main.CroppyActivity
 
 object Croppy {
-    var recordedError: Throwable? = null
-        internal set
+    var exceptionReporter: ExceptionReporter? = null
 
     fun start(activity: Activity, cropRequest: CropRequest) {
         CroppyActivity.newIntent(context = activity, cropRequest = cropRequest)
@@ -17,5 +16,9 @@ object Croppy {
     fun start(fragment: Fragment, cropRequest: CropRequest) {
         CroppyActivity.newIntent(context = fragment.requireContext(), cropRequest = cropRequest)
             .also { fragment.startActivityForResult(it, cropRequest.requestCode) }
+    }
+
+    interface ExceptionReporter {
+        fun onException(throwable: Throwable)
     }
 }

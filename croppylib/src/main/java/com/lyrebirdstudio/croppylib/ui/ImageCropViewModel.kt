@@ -39,7 +39,7 @@ class ImageCropViewModel(val app: Application) : AndroidViewModel(app) {
                 resizedBitmapLiveData.value = it
             }, {
                 it.printStackTrace()
-                Croppy.recordedError = it
+                Croppy.exceptionReporter?.onException(it)
                 resizedBitmapLiveData.value = ResizedBitmap(null)
             })
             .also { compositeDisposable.add(it) }

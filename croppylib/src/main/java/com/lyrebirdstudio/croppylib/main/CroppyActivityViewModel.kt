@@ -35,7 +35,7 @@ class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
             .subscribe(
                 { saveBitmapLiveData.value = cropRequest.destinationUri },
                 {
-                    Croppy.recordedError = it
+                    Croppy.exceptionReporter?.onException(it)
                     doOnCropError()
                 })
             .let { cropDisposable = it }

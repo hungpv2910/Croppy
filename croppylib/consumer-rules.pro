@@ -1,1 +1,1 @@
--keep class com.lyrebirdstudio.croppylib.util.extensions.** { *; }
+-keep class com.lyrebirdstudio.croppylib.util.model.AnimatableRectF { *; }

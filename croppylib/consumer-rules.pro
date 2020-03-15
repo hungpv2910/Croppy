@@ -1,0 +1,1 @@
+-keep class com.lyrebirdstudio.croppylib.util.extensions.** { *; }

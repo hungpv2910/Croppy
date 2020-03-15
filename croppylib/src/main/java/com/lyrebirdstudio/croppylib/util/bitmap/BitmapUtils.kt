@@ -136,8 +136,8 @@ object BitmapUtils {
             display.getSize(size)
         }
 
-        width = (size.x * 1.0f).toInt()
-        height = (size.y * 1.0f).toInt()
+        width = (size.x * 0.75f).toInt()
+        height = (size.y * 0.75f).toInt()
         return width to height
     }
 }

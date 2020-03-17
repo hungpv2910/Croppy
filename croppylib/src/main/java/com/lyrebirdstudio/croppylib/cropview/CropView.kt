@@ -198,16 +198,6 @@ class CropView @JvmOverloads constructor(
      */
     private val maskBackgroundColor = ContextCompat.getColor(context, R.color.colorCropAlpha)
 
-    /**
-     * Mask canvas
-     */
-    private var maskCanvas: Canvas? = null
-
-    /**
-     * Mask bitmap
-     */
-    private var maskBitmap: Bitmap? = null
-
     private val bitmapGestureListener = object : BitmapGestureHandler.BitmapGestureListener {
         override fun onDoubleTap(motionEvent: MotionEvent) {
 
@@ -495,8 +485,6 @@ class CropView @JvmOverloads constructor(
 
         viewRect.set(0f, 0f, measuredWidth.toFloat(), measuredHeight.toFloat())
 
-        createMaskBitmap()
-
         initializeBitmapMatrix()
 
         initializeCropRect()
@@ -504,14 +492,6 @@ class CropView @JvmOverloads constructor(
         onInitialized?.invoke()
 
         invalidate()
-    }
-
-    /**
-     * Create mask bitmap
-     */
-    private fun createMaskBitmap() {
-        maskBitmap = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
-        maskCanvas = Canvas(maskBitmap!!)
     }
 
     /**

@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.lyrebirdstudio.croppylib.Croppy
 import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
 import com.lyrebirdstudio.croppylib.util.bitmap.BitmapUtils
+import com.lyrebirdstudio.croppylib.util.bitmap.CropUtils
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -25,10 +26,11 @@ class CroppyActivityViewModel(val app: Application) : AndroidViewModel(app) {
     fun showProgressLiveData(): LiveData<Boolean> = showProgressLiveData
     fun errorCropLiveData(): LiveData<Boolean> = errorCropLiveData
 
-    fun saveBitmap(cropRequest: CropRequest, croppedBitmapData: CroppedBitmapData) {
+    fun doCrop(cropRequest: CropRequest, croppedBitmapData: CroppedBitmapData) {
         cropDisposable?.dispose()
-        BitmapUtils
-            .saveBitmap(croppedBitmapData, cropRequest.destinationUri.toFile())
+
+        CropUtils.doCrop(croppedBitmapData)
+            .flatMapCompletable { BitmapUtils.saveBitmap(it, cropRequest.destinationUri.toFile()) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .composeProgress()

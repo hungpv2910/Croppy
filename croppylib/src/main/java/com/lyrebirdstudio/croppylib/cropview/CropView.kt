@@ -405,43 +405,7 @@ class CropView @JvmOverloads constructor(
      */
     fun getCroppedData(): CroppedBitmapData {
         val croppedBitmapRect = getCropSizeOriginal()
-
-        if (bitmapRect.intersect(croppedBitmapRect).not()) {
-            return CroppedBitmapData(croppedBitmap = bitmap)
-        }
-
-        val cropLeft = if (croppedBitmapRect.left.roundToInt() < bitmapRect.left) {
-            bitmapRect.left.toInt()
-        } else {
-            croppedBitmapRect.left.roundToInt()
-        }
-
-        val cropTop = if (croppedBitmapRect.top.roundToInt() < bitmapRect.top) {
-            bitmapRect.top.toInt()
-        } else {
-            croppedBitmapRect.top.roundToInt()
-        }
-
-        val cropRight = if (croppedBitmapRect.right.roundToInt() > bitmapRect.right) {
-            bitmapRect.right.toInt()
-        } else {
-            croppedBitmapRect.right.roundToInt()
-        }
-
-        val cropBottom = if (croppedBitmapRect.bottom.roundToInt() > bitmapRect.bottom) {
-            bitmapRect.bottom.toInt()
-        } else {
-            croppedBitmapRect.bottom.roundToInt()
-        }
-
-        bitmap?.let {
-            val croppedBitmap = Bitmap.createBitmap(
-                it, cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop
-            )
-            return CroppedBitmapData(croppedBitmap = croppedBitmap)
-        }
-
-        throw IllegalStateException("Bitmap is null.")
+        return CroppedBitmapData(croppedBitmapRect, bitmapRect, bitmap)
     }
 
     /**

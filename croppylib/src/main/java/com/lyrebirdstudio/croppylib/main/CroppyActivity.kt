@@ -43,7 +43,7 @@ class CroppyActivity : AppCompatActivity() {
 
         cropFragment?.apply {
             onApplyClicked = {
-                viewModel.saveBitmap(cropRequest = cropRequest, croppedBitmapData = it)
+                viewModel.doCrop(cropRequest = cropRequest, croppedBitmapData = it)
             }
 
             onImageLoadFailed = {

@@ -8,9 +8,8 @@ import android.net.Uri
 import android.view.Display
 import android.view.WindowManager
 import androidx.exifinterface.media.ExifInterface
-import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
-import com.lyrebirdstudio.croppylib.util.file.UriUtils.processUri
 import com.lyrebirdstudio.croppylib.util.extensions.rotateBitmap
+import com.lyrebirdstudio.croppylib.util.file.UriUtils.processUri
 import com.lyrebirdstudio.croppylib.util.file.inputStream
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -20,11 +19,11 @@ import java.io.IOException
 import java.io.InputStream
 
 object BitmapUtils {
-    fun saveBitmap(croppedBitmapData: CroppedBitmapData, file: File): Completable {
+    fun saveBitmap(bitmap: Bitmap?, file: File): Completable {
         return Completable.create {
             try {
                 FileOutputStream(file).use { out ->
-                    croppedBitmapData.croppedBitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+                    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
                     it.onComplete()
                 }
             } catch (e: Exception) {

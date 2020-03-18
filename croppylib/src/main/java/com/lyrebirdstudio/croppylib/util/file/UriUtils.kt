@@ -11,6 +11,7 @@ import okio.buffer
 import okio.sink
 import okio.source
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.net.URL
@@ -19,16 +20,8 @@ object UriUtils {
     @WorkerThread
     fun processUri(context: Context, sourceUri: Uri, tempFileName: String? = null): Uri {
         return when (sourceUri.scheme ?: "") {
-            "http", "https" -> handleRemoteResource(
-                context,
-                sourceUri,
-                tempFileName
-            )
-            "content" -> handleContentResource(
-                context,
-                sourceUri,
-                tempFileName
-            )
+            "http", "https" -> handleRemoteResource(context, sourceUri, tempFileName)
+            "content" -> handleContentResource(context, sourceUri, tempFileName)
             else -> sourceUri
         }
     }
@@ -60,10 +53,7 @@ object UriUtils {
         return if (!path.isNullOrEmpty() && File(path).exists()) {
             Uri.fromFile(File(path))
         } else {
-            val tempUri = newFile(
-                context,
-                tempFileName
-            ).toUri()
+            val tempUri = newFile(context, tempFileName).toUri()
             copyFile(context, sourceUri, tempUri)
             tempUri
         }
@@ -80,11 +70,14 @@ object UriUtils {
         if (fileName.isNullOrBlank()) "process_uri_file.tmp"
         else fileName
     ).apply {
-        if (exists()) delete()
-        createNewFile()
+        if (!exists()) createNewFile()
     }
 }
 
 fun Uri.inputStream(context: Context): InputStream? {
-    return context.contentResolver.openInputStream(this)
+    return try {
+        context.contentResolver.openInputStream(this)
+    } catch (throwable: FileNotFoundException) {
+        throw FileNotFoundException("File could could not be found! uri: ${toString()}")
+    }
 }

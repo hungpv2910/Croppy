@@ -224,8 +224,14 @@ class CropView @JvmOverloads constructor(
 
             bitmapMatrix.animateScaleToPoint(
                 DOUBLE_TAP_SCALE_FACTOR,
-                motionEvent.x,
-                motionEvent.y
+                motionEvent.x.coerceIn(
+                    bitmapMatrix.getTranslateX(),
+                    bitmapMatrix.getTranslateX() + bitmapRect.width() * bitmapMatrix.getScaleX()
+                ),
+                motionEvent.y.coerceIn(
+                    bitmapMatrix.getTranslateY(),
+                    bitmapMatrix.getTranslateY() + bitmapRect.height() * bitmapMatrix.getScaleY()
+                )
             ) {
                 notifyCropRectChanged()
                 invalidate()

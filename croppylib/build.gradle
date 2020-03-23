@@ -52,7 +52,7 @@ dependencies {
     //Architecture Components
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     kapt "androidx.lifecycle:lifecycle-compiler:2.2.0"
-    api "com.huhustudio:aspectratiorecyclerviewlib:1.0.0"
+    api "com.huhustudio:aspectratiorecyclerviewlib:1.0.3"
 
     //RxJava & RxAndroid
     implementation "io.reactivex.rxjava2:rxjava:2.2.13"

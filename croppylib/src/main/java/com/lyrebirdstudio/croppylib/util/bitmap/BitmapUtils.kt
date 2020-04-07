@@ -9,6 +9,7 @@ import android.view.Display
 import android.view.WindowManager
 import androidx.exifinterface.media.ExifInterface
 import com.lyrebirdstudio.croppylib.util.extensions.rotateBitmap
+import com.lyrebirdstudio.croppylib.util.file.UriUtils.getDefaultOutputUri
 import com.lyrebirdstudio.croppylib.util.file.UriUtils.processUri
 import com.lyrebirdstudio.croppylib.util.file.inputStream
 import io.reactivex.Completable
@@ -36,27 +37,28 @@ object BitmapUtils {
     fun resize(sourceUri: Uri, context: Context): Single<ResizedBitmap> {
         return Single.create {
             try {
-                val transformedSource = processUri(context, sourceUri)
+                processUri(context, sourceUri)
+                val destUri = getDefaultOutputUri(context)
 
                 val (reqWidth, reqHeight) = calculateMaxBitmapSize(context)
                 val orientation =
-                    transformedSource.inputStream(context).use { stream -> getOrientation(stream) }
+                    destUri.inputStream(context).use { stream -> getOrientation(stream) }
                 val options = BitmapFactory.Options()
                 options.inJustDecodeBounds = true
-                transformedSource.inputStream(context).use { stream -> getBitmap(stream, options) }
+                destUri.inputStream(context).use { stream -> getBitmap(stream, options) }
 
                 options.inSampleSize =
                     calculateInSampleSize(options, reqWidth, reqHeight, orientation)
                 options.inJustDecodeBounds = false
 
-                val resizedBitmap = transformedSource.inputStream(context)
+                val resizedBitmap = destUri.inputStream(context)
                     .use { stream -> getBitmap(stream, options) }
                     ?.rotateBitmap(orientation)
 
                 if (resizedBitmap == null) it.onError(
                     Exception(
                         "Could not rotate bitmap, seemed an OOM?" +
-                                " sourceUri: $sourceUri. transformedSource: $transformedSource"
+                                " sourceUri: $sourceUri. transformedSource: $destUri"
                     )
                 )
                 else it.onSuccess(ResizedBitmap(resizedBitmap))

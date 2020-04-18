@@ -222,16 +222,15 @@ class CropView @JvmOverloads constructor(
                 return
             }
 
+            val translateX = bitmapMatrix.getTranslateX()
+            val translateY = bitmapMatrix.getTranslateY()
+            val scaleX = bitmapMatrix.getScaleX()
+            val scaleY = bitmapMatrix.getScaleY()
+
             bitmapMatrix.animateScaleToPoint(
                 DOUBLE_TAP_SCALE_FACTOR,
-                motionEvent.x.coerceIn(
-                    bitmapMatrix.getTranslateX(),
-                    bitmapMatrix.getTranslateX() + bitmapRect.width() * bitmapMatrix.getScaleX()
-                ),
-                motionEvent.y.coerceIn(
-                    bitmapMatrix.getTranslateY(),
-                    bitmapMatrix.getTranslateY() + bitmapRect.height() * bitmapMatrix.getScaleY()
-                )
+                motionEvent.x.coerceIn(translateX, translateX + bitmapRect.width() * scaleX),
+                motionEvent.y.coerceIn(translateY, translateY + bitmapRect.height() * scaleY)
             ) {
                 notifyCropRectChanged()
                 invalidate()

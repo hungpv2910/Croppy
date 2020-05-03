@@ -381,14 +381,14 @@ class CropView @JvmOverloads constructor(
      * Set bitmap from outside of this view.
      * Calculates bitmap rect and bitmap min rect.
      */
-    fun setBitmap(bitmap: Bitmap?) {
+    fun setBitmap(bitmap: Bitmap) {
         this.bitmap = bitmap
 
         bitmapRect.set(
             0f,
             0f,
-            this.bitmap?.width?.toFloat() ?: 0f,
-            this.bitmap?.height?.toFloat() ?: 0f
+            bitmap.width.toFloat(),
+            bitmap.height.toFloat()
         )
 
         val bitmapMinRectSize = max(bitmapRect.width(), bitmapRect.height()) / MAX_SCALE

@@ -47,6 +47,9 @@ object BitmapUtils {
                 options.inJustDecodeBounds = true
                 destUri.inputStream(context).use { stream -> getBitmap(stream, options) }
 
+                val outWidth = options.outWidth
+                val outHeight = options.outHeight
+
                 options.inSampleSize =
                     calculateInSampleSize(options, reqWidth, reqHeight, orientation)
                 options.inJustDecodeBounds = false
@@ -58,7 +61,7 @@ object BitmapUtils {
                 if (resizedBitmap == null) it.onError(
                     Exception(
                         "Could not rotate bitmap, seemed an OOM?" +
-                                " sourceUri: $sourceUri. transformedSource: $destUri"
+                                " sourceUri: $sourceUri. transformedSource: $destUri. outWidth = $outWidth. outHeight = $outHeight"
                     )
                 )
                 else it.onSuccess(ResizedBitmap(resizedBitmap))

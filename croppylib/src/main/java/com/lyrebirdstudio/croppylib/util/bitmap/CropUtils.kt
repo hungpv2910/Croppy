@@ -3,6 +3,7 @@ package com.lyrebirdstudio.croppylib.util.bitmap
 import android.graphics.Bitmap
 import com.lyrebirdstudio.croppylib.ui.CroppedBitmapData
 import io.reactivex.Observable
+import java.lang.IllegalArgumentException
 import kotlin.math.roundToInt
 
 object CropUtils {
@@ -42,6 +43,9 @@ object CropUtils {
             }
 
             if (sourceBitmap != null) {
+                if (cropRight - cropLeft == 0 || cropBottom - cropTop == 0) {
+                    throw IllegalArgumentException("width or height could not be null bitmapRect: $bitmapRect - croppedBitmapRect: $croppedBitmapRect")
+                }
                 return@fromCallable Bitmap.createBitmap(
                     sourceBitmap, cropLeft, cropTop, cropRight - cropLeft, cropBottom - cropTop
                 )

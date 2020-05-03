@@ -84,15 +84,16 @@ class ImageCropFragment : Fragment() {
         viewModel
             .getResizedBitmapLiveData()
             .observe(viewLifecycleOwner, Observer { resizedBitmap ->
-                if (resizedBitmap.bitmap == null) {
+                val bitmap = resizedBitmap.bitmap
+                if (bitmap == null) {
                     onImageLoadFailed?.invoke()
                     return@Observer
                 }
 
                 if (ViewCompat.isLaidOut(binding.cropView)) {
-                    binding.cropView.setBitmap(resizedBitmap.bitmap)
+                    binding.cropView.setBitmap(bitmap)
                 } else {
-                    binding.cropView.doOnPreDraw { binding.cropView.setBitmap(resizedBitmap.bitmap) }
+                    binding.cropView.doOnPreDraw { binding.cropView.setBitmap(bitmap) }
                 }
             })
 

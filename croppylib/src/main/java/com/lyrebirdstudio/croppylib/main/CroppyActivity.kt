@@ -31,17 +31,15 @@ class CroppyActivity : AppCompatActivity() {
 
         val cropRequest = intent.getParcelableExtra(KEY_CROP_REQUEST) ?: CropRequest.empty()
 
-        val cropFragment = if (savedInstanceState == null) {
-            ImageCropFragment.newInstance(cropRequest).also { fragment ->
-                supportFragmentManager.beginTransaction()
-                    .add(R.id.containerCroppy, fragment, ImageCropFragment::class.java.name)
-                    .commitAllowingStateLoss()
-            }
-        } else {
+        val cropFragment =
             supportFragmentManager.findFragmentByTag(ImageCropFragment::class.java.name) as? ImageCropFragment
-        }
+                ?: ImageCropFragment.newInstance(cropRequest).also { fragment ->
+                    supportFragmentManager.beginTransaction()
+                        .add(R.id.containerCroppy, fragment, ImageCropFragment::class.java.name)
+                        .commitAllowingStateLoss()
+                }
 
-        cropFragment?.apply {
+        cropFragment.apply {
             onApplyClicked = {
                 viewModel.doCrop(cropRequest = cropRequest, croppedBitmapData = it)
             }

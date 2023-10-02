@@ -5,7 +5,7 @@ configurations {
 }
 
 dependencies {
-    deployerJar "ar.com.synergian:wagon-git:0.2.3"
+    deployerJar "ar.com.synergian:wagon-git:0.2.5"
 }
 
 task sourcesJar(type: Jar) {

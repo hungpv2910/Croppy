@@ -30,6 +30,7 @@ class CroppyActivity : AppCompatActivity() {
 
         Croppy.croppyActivityLifecycle?.onActivityCreated(
             this,
+            findViewById(R.id.root_view),
             findViewById(R.id.topAdContainer),
             findViewById(R.id.bottomAdContainer)
         )

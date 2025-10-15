@@ -4,7 +4,8 @@
     <application>
         <activity
             android:name=".main.CroppyActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -26,7 +26,7 @@ object Croppy {
     }
 
     interface OnCroppyActivityLifecycle {
-        fun onActivityCreated(context: Context, topAdContainer: View, bottomAdContainer: View)
+        fun onActivityCreated(context: Context, rootView: View, topAdContainer: View, bottomAdContainer: View)
         fun onActivityDestroy(context: Context)
     }
 }

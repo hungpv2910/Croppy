@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?colorPrimary"
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/topAdContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
+            android:layout_height="match_parent"
+            android:background="?android:windowBackground"
+            android:orientation="vertical">
 
-        <FrameLayout
-            android:id="@+id/containerCroppy"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            <LinearLayout
+                android:id="@+id/topAdContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
 
-        </FrameLayout>
+            <FrameLayout
+                android:id="@+id/containerCroppy"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
-        <LinearLayout
-            android:id="@+id/bottomAdContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </LinearLayout>
+            </FrameLayout>
+
+            <LinearLayout
+                android:id="@+id/bottomAdContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </LinearLayout>
+    </FrameLayout>
 </layout>
